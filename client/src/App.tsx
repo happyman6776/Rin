@@ -125,21 +125,26 @@ function RouteMe({ path, children, headerComponent, paddingClassName, requirePer
   return (
     <Route path={path} >
       {params => (
-        <>
+        <div className="min-h-screen bg-neutral-50/50">
           <Header>{headerComponent}</Header>
-          {/* 1. 将 Padding 的内边距缩小，确保侧边栏紧贴左边 */}
-          <Padding className={`${paddingClassName || ''} w-full pl-4 md:pl-8 pr-4 md:pr-12`}>
-            {/* 2. 移除 mx-auto，确保布局靠左；max-w 设置为 1800px 或更高 */}
-            <div className="flex flex-col lg:flex-row gap-6 xl:gap-10 py-8 max-w-[1800px]">
+          <Padding className={paddingClassName}>
+            {/* 布局：移除 mx-auto 实现左移；max-w 提升至 1800px 释放内容空间 */}
+            <div className="flex flex-col lg:flex-row gap-8 xl:gap-12 py-10 w-full max-w-[1800px]">
               
-              {/* 3. 侧边栏：保持固定宽度 */}
-              <aside className="w-full lg:w-[220px] flex-shrink-0">
-                <Sidebar />
+              {/* 侧边栏优化：更窄的宽度，更清晰的导航感 */}
+              <aside className="w-full lg:w-[210px] xl:w-[230px] flex-shrink-0">
+                <div className="sticky top-24 transition-all">
+                   <Sidebar />
+                </div>
               </aside>
               
-              {/* 4. 内容区：移除任何 max-width，占据剩余全部空间 */}
-              <main className="flex-1 min-w-0 bg-white/60 backdrop-blur-sm shadow-sm border border-neutral-100 rounded-[2.5rem]">
-                <div className="w-full h-full p-6 md:p-12 toc-content">
+              {/* 内容区美化：
+                  1. bg-white/70 + backdrop-blur: 增强通透感
+                  2. shadow-xl/5: 极细微的投影增强悬浮感
+                  3. border-neutral-200/50: 柔和的分隔线
+              */}
+              <main className="flex-1 min-w-0 bg-white/70 backdrop-blur-xl shadow-2xl shadow-neutral-200/40 border border-neutral-200/50 rounded-[3rem] transition-all hover:shadow-neutral-200/60">
+                <div className="w-full h-full p-6 md:p-10 lg:p-14 toc-content leading-relaxed text-neutral-800">
                   {typeof children === 'function' ? children(params) : children}
                 </div>
               </main>
@@ -147,7 +152,7 @@ function RouteMe({ path, children, headerComponent, paddingClassName, requirePer
             </div>
           </Padding>
           <Footer />
-        </>
+        </div>
       )}
     </Route>
   )
