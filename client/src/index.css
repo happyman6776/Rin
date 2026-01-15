@@ -1,6 +1,6 @@
 @import "./base.css";
 
-/* 字体配置保持不变 */
+/* 字体配置 */
 @font-face {
   font-family: "Cantarell";
   font-style: normal;
@@ -8,13 +8,9 @@
   font-weight: 400;
   src: url(/cantarell_5.0.12_latin-400-normal.woff2) format("woff2"),
     url(/cantarell_5.0.13_latin-400-normal.woff) format("woff");
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
-    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191,
-    U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
 body {
-  /* 使用标准 slate 色系，确保部署不会因为变量丢失而失败 */
   @apply bg-slate-50 text-slate-900 antialiased;
   font-family: Cantarell, "Source Han Serif CN VF", system-ui, sans-serif !important;
   margin: 0;
@@ -25,14 +21,13 @@ textarea:focus {
   outline: none;
 }
 
-/* --- Markdown 内容美化 --- */
+/* Markdown 内容美化 */
 .wmde-markdown {
   @apply bg-transparent;
   font-family: inherit !important;
   line-height: 1.8;
 }
 
-/* 图片现代感：大圆角 + 柔和阴影 */
 .wmde-markdown img {
   @apply rounded-[2rem] shadow-xl my-10 transition-transform duration-500 hover:scale-[1.02];
   display: block;
@@ -40,25 +35,22 @@ textarea:focus {
   margin-right: auto;
 }
 
-/* 代码块精致化 */
 .wmde-markdown code {
   @apply text-indigo-600 bg-indigo-50/80 px-2 py-0.5 rounded-lg mx-1 font-mono text-[0.9em];
 }
 
-/* 链接动画 */
 .link-line a {
   @apply text-indigo-600 no-underline border-b border-transparent hover:border-indigo-600 transition-all duration-300;
 }
 
-/* 警示框：卡片式设计 */
+/* 警示框 */
 .markdown-alert {
-  @apply !border-l-[6px] border border-slate-200 rounded-[1.5rem] !py-5 my-8 !px-8 shadow-sm backdrop-blur-sm;
+  @apply !border-l-[6px] border border-slate-200 rounded-[1.5rem] !py-5 my-8 !px-8 shadow-sm;
 }
 .markdown-alert-note { @apply !border-blue-500 bg-blue-50/40 !text-blue-900; }
 .markdown-alert-tip { @apply !border-emerald-500 bg-emerald-50/40 !text-emerald-900; }
-.markdown-alert-important { @apply !border-purple-500 bg-purple-50/40 !text-purple-900; }
 
-/* 表格精致化 */
+/* 表格 */
 .table { 
   @apply w-full border-collapse my-8 rounded-[1.25rem] overflow-hidden shadow-sm border border-slate-200; 
   display: block !important; 
@@ -66,11 +58,16 @@ textarea:focus {
 .table th { @apply bg-slate-100/80 font-bold text-slate-700 px-6 py-4 text-left; }
 .table td { @apply border-t border-slate-100 px-6 py-4 text-slate-600; }
 
-/* --- 侧边栏 TOC 美化 --- */
+/* 侧边栏 TOC (已移除导致报错的 scrollbar-hide) */
 .toc { 
-  @apply pr-4 scrollbar-hide;
+  @apply pr-4;
   max-height: calc(100vh - 200px);
+  overflow-y: auto;
+  scrollbar-width: none; /* Firefox 隐藏滚动条 */
+  -ms-overflow-style: none; /* IE 隐藏滚动条 */
 }
+.toc::-webkit-scrollbar { display: none; } /* Chrome/Safari 隐藏滚动条 */
+
 .toc-list { @apply m-0 pl-4 border-l border-slate-200 list-none space-y-2; }
 a.toc-link { 
   @apply text-slate-500 text-sm no-underline transition-all duration-300 hover:text-indigo-600; 
