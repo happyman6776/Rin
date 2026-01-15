@@ -128,19 +128,18 @@ function RouteMe({ path, children, headerComponent, paddingClassName, requirePer
         <div className="flex flex-col min-h-screen">
           <Header>{headerComponent}</Header>
           <Padding className={`${paddingClassName || ''} flex-1`}>
-            {/* 布局容器：最大宽度 2200px，确保在大屏下能容纳三栏 */}
-            <div className="flex flex-col lg:flex-row gap-8 xl:gap-10 py-8 w-full max-w-[2200px] items-start">
+            {/* 布局容器：最大宽度 2300px，确保超大屏显示效果 */}
+            <div className="flex flex-col lg:flex-row gap-8 xl:gap-12 py-8 w-full max-w-[2300px] items-start">
               
-              {/* 左侧栏：固定 220px */}
-              <aside className="w-full lg:w-[220px] flex-shrink-0 sticky top-24 z-10">
+              {/* 左侧栏：稍微加宽到 240px 以容纳新设计 */}
+              <aside className="w-full lg:w-[240px] flex-shrink-0 sticky top-24 z-10">
                 <Sidebar />
               </aside>
               
-              {/* 主内容区：使用 flex-1 占据中间所有空间 */}
+              {/* 主内容区 */}
               <main className="flex-1 min-w-0 bg-white/70 backdrop-blur-xl shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-neutral-100 rounded-[2.5rem] overflow-visible">
-                {/* 增加右侧内边距，防止内容贴到目录上（如果是移动端则不加） */}
-                <div className="w-full h-full p-6 md:p-10 lg:p-14 toc-content text-[1.05rem] leading-loose text-neutral-800 antialiased flex flex-col xl:flex-row gap-8">
-                   {/* 这里通过 CSS 让 children 里的 TOC 自动去右边 */}
+                <div className="w-full h-full p-6 md:p-10 lg:p-14 toc-content text-[1.05rem] leading-loose text-neutral-800 antialiased flex flex-col xl:flex-row gap-10">
+                  {/* 文章本体 */}
                   <div className="flex-1 min-w-0">
                     {typeof children === 'function' ? children(params) : children}
                   </div>

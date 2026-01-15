@@ -3,6 +3,7 @@ import { Link, useLocation } from 'wouter';
 
 const Sidebar: React.FC = () => {
   const [location] = useLocation();
+
   const menuItems = [
     { name: "营养与饮食", path: "/nutrition" },
     { name: "慢病管理", subtitle: "三高/糖尿病等", path: "/chronic-disease" },
@@ -16,57 +17,54 @@ const Sidebar: React.FC = () => {
   ];
 
   return (
-    <aside className="w-full flex-shrink-0 hidden lg:block">
-      <div className="sticky top-28 space-y-8">
-        <div className="px-6">
-          <h2 className="text-xs font-black text-theme/70 uppercase tracking-widest">
-            健康专栏
-          </h2>
-          <div className="h-1 w-12 bg-theme/20 mt-2 rounded-full"></div>
-        </div>
-
-        <nav className="flex flex-col gap-2 px-4">
-          {menuItems.map((item) => {
-            const isActive = location === item.path;
-            return (
-              <Link
-                key={item.name}
-                to={item.path}
-                className={`
-                  group block px-6 py-4 rounded-2xl transition-all duration-300 no-underline
-                  ${isActive
-                    ? 'bg-theme/10 shadow-md shadow-theme/20 text-theme font-bold'
-                    : 'text-gray-700 dark:text-gray-300 hover:bg-neutral-100/70 dark:hover:bg-neutral-800/50 hover:translate-x-2 hover:shadow-sm'}
-                `}
-              >
-                <div className={`
-                  text-lg font-semibold transition-all duration-300
-                  ${isActive ? 'translate-x-1' : 'group-hover:translate-x-1'}
-                `}>
-                  {item.name}
-                </div>
-                {item.subtitle && (
-                  <div className="text-sm mt-1 font-medium text-gray-500 dark:text-gray-400 opacity-80">
-                    {item.subtitle}
-                  </div>
-                )}
-                {item.disclaimer && (
-                  <div className="text-xs text-red-500/80 dark:text-red-400/80 mt-3 pt-3 border-t border-red-200/30 dark:border-red-800/30 italic leading-relaxed">
-                    {item.disclaimer}
-                  </div>
-                )}
-              </Link>
-            );
-          })}
-        </nav>
-
-        <div className="px-6 pt-6 border-t border-neutral-200/50 dark:border-neutral-700/50">
-          <p className="text-xs text-gray-500 dark:text-gray-400 italic leading-relaxed">
-            本站内容仅供健康参考<br />
-            如有不适，请及时就医
-          </p>
-        </div>
+    <aside className="w-full">
+      {/* 1. 标题优化：加大字号(text-2xl)，加粗，并用蓝色竖线(border-l-4)进行视觉对齐 */}
+      <div className="mb-6 pl-1">
+        <h2 className="text-xl font-black text-slate-800 flex items-center gap-3">
+          <span className="w-1.5 h-6 bg-blue-600 rounded-full inline-block shadow-sm"></span>
+          健康专栏
+        </h2>
       </div>
+
+      <nav className="flex flex-col gap-2.5">
+        {menuItems.map((item) => {
+          const isActive = location === item.path;
+          return (
+            <Link 
+              key={item.name} 
+              to={item.path}
+              // 2. 交互优化：默认深蓝灰色，悬停变亮蓝+背景色
+              className={`group relative flex flex-col px-5 py-4 rounded-2xl transition-all duration-300 no-underline border border-transparent
+                ${isActive 
+                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30 translate-x-1' // 选中状态
+                  : 'bg-white/50 text-slate-600 hover:bg-blue-50 hover:text-blue-700 hover:border-blue-100 hover:shadow-md hover:translate-x-1' // 默认状态
+                }`}
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-[16px] font-bold tracking-wide">
+                  {item.name}
+                </span>
+                {/* 悬停时出现的箭头 */}
+                <svg className={`w-4 h-4 transition-all duration-300 ${isActive ? 'opacity-100' : 'opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 text-blue-500'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+
+              {item.subtitle && (
+                <span className={`text-[12px] mt-1 font-medium ${isActive ? 'text-blue-100' : 'text-slate-400 group-hover:text-blue-400'}`}>
+                  {item.subtitle}
+                </span>
+              )}
+              
+              {item.disclaimer && (
+                <span className={`text-[10px] mt-2 pt-2 border-t border-dashed leading-tight ${isActive ? 'border-blue-400 text-blue-100' : 'border-slate-200 text-red-400'}`}>
+                  {item.disclaimer}
+                </span>
+              )}
+            </Link>
+          );
+        })}
+      </nav>
     </aside>
   );
 };
