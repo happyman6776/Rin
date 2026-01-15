@@ -125,26 +125,29 @@ function RouteMe({ path, children, headerComponent, paddingClassName, requirePer
   return (
     <Route path={path} >
       {params => (
-        <div className="min-h-screen bg-neutral-50/50">
+        <div className="flex flex-col min-h-screen bg-[#f8f9fa]">
           <Header>{headerComponent}</Header>
-          <Padding className={paddingClassName}>
-            {/* 布局：移除 mx-auto 实现左移；max-w 提升至 1800px 释放内容空间 */}
-            <div className="flex flex-col lg:flex-row gap-8 xl:gap-12 py-10 w-full max-w-[1800px]">
+          {/* 重点：Padding 不再携带 mx- 属性，确保内容块能自由向左靠拢 */}
+          <Padding className={`${paddingClassName || ''} flex-1 flex justify-start`}>
+            {/* 1. items-start: 确保顶部对齐
+               2. w-full max-w-[1920px]: 极其宽阔的视野
+               3. 移除 mx-auto: 彻底解决居中问题 
+            */}
+            <div className="flex flex-col lg:flex-row gap-6 xl:gap-10 py-8 w-full items-start">
               
-              {/* 侧边栏优化：更窄的宽度，更清晰的导航感 */}
-              <aside className="w-full lg:w-[210px] xl:w-[230px] flex-shrink-0">
-                <div className="sticky top-24 transition-all">
-                   <Sidebar />
-                </div>
+              {/* 侧边栏：微调宽度，确保与内容比例协调 */}
+              <aside className="w-full lg:w-[240px] flex-shrink-0 sticky top-24">
+                <Sidebar />
               </aside>
               
-              {/* 内容区美化：
-                  1. bg-white/70 + backdrop-blur: 增强通透感
-                  2. shadow-xl/5: 极细微的投影增强悬浮感
-                  3. border-neutral-200/50: 柔和的分隔线
+              {/* 内容主卡片：
+                  - flex-1: 自动填满右侧剩余所有空间
+                  - bg-white: 纯净白底
+                  - shadow-sm: 柔和阴影，更具空气感
+                  - rounded-[2.5rem]: 现代感大圆角 
               */}
-              <main className="flex-1 min-w-0 bg-white/70 backdrop-blur-xl shadow-2xl shadow-neutral-200/40 border border-neutral-200/50 rounded-[3rem] transition-all hover:shadow-neutral-200/60">
-                <div className="w-full h-full p-6 md:p-10 lg:p-14 toc-content leading-relaxed text-neutral-800">
+              <main className="flex-1 min-w-0 bg-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-neutral-100/80 rounded-[2.5rem] overflow-hidden">
+                <div className="w-full h-full p-6 md:p-12 lg:p-16 toc-content text-[1.05rem] leading-relaxed text-neutral-800">
                   {typeof children === 'function' ? children(params) : children}
                 </div>
               </main>
