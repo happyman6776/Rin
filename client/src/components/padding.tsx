@@ -2,9 +2,9 @@ import React from "react";
 
 export function Padding({ className = "", children }: { className?: string, children?: React.ReactNode }) {
     return (
-        // 彻底删除 sm:mx-8 md:mx-12 lg:mx-16 xl:mx-24 2xl:mx-32
-        // 改用 w-full 确保容器占满宽度，只保留基础的左右内边距防止贴边
-        <div className={`w-full px-4 md:px-6 lg:px-8 ${className} duration-300`} >
+        // 彻底删除响应式 mx- 限制
+        // 使用 pl-4 md:pl-10 确保侧边栏紧贴左侧，pr-4 md:pr-10 留出右侧呼吸感
+        <div className={`w-full pl-4 md:pl-10 pr-4 md:pr-10 ${className} transition-all duration-300`} >
             {children}
         </div >
     )
