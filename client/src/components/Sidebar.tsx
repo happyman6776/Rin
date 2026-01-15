@@ -1,7 +1,9 @@
 import React from 'react';
-import { Link } from 'wouter'; // Rin 使用 wouter 进行路由跳转
+import { Link, useLocation } from 'wouter';
 
 const Sidebar: React.FC = () => {
+  const [location] = useLocation();
+
   const menuItems = [
     { name: "营养与饮食", path: "/nutrition" },
     { name: "慢病管理", subtitle: "三高/糖尿病等", path: "/chronic-disease" },
@@ -16,32 +18,43 @@ const Sidebar: React.FC = () => {
 
   return (
     <aside className="w-64 flex-shrink-0 hidden lg:block">
-      <div className="sticky top-24 space-y-8">
-        <h2 className="text-xs font-bold text-neutral-400 uppercase tracking-[0.2em] border-b border-neutral-100 pb-2">
-          健康专栏
-        </h2>
-        <nav className="flex flex-col gap-6">
-          {menuItems.map((item) => (
-            <Link 
-              key={item.name} 
-              to={item.path}
-              className="group block no-underline"
-            >
-              <div className="text-[16px] font-medium t-primary group-hover:text-blue-600 transition-colors duration-200">
-                {item.name}
-              </div>
-              {item.subtitle && (
-                <div className="text-[12px] text-neutral-400 mt-1 font-normal">
-                  {item.subtitle}
+      <div className="sticky top-28 space-y-6 pr-4">
+        {/* 侧边栏标题设计 */}
+        <div className="px-4">
+          <h2 className="text-[11px] font-black text-blue-600/60 uppercase tracking-[0.25em]">
+            健康专栏
+          </h2>
+          <div className="h-1 w-6 bg-blue-500/30 mt-1.5 rounded-full"></div>
+        </div>
+
+        <nav className="flex flex-col gap-1.5">
+          {menuItems.map((item) => {
+            const isActive = location === item.path;
+            return (
+              <Link 
+                key={item.name} 
+                to={item.path}
+                className={`group block px-4 py-3.5 rounded-2xl transition-all duration-300 no-underline
+                  ${isActive 
+                    ? 'bg-blue-50/80 shadow-sm text-blue-700' 
+                    : 'hover:bg-neutral-50 text-neutral-600 hover:translate-x-1'}`}
+              >
+                <div className={`text-[15px] font-bold ${isActive ? 'scale-105' : ''} transition-transform origin-left`}>
+                  {item.name}
                 </div>
-              )}
-              {item.disclaimer && (
-                <div className="text-[10px] text-red-500/70 mt-2 italic leading-relaxed border-l-2 border-red-50 px-2">
-                  {item.disclaimer}
-                </div>
-              )}
-            </Link>
-          ))}
+                {item.subtitle && (
+                  <div className={`text-[11px] mt-0.5 font-normal opacity-70`}>
+                    {item.subtitle}
+                  </div>
+                )}
+                {item.disclaimer && (
+                  <div className="text-[9px] text-red-400 mt-2 pt-2 border-t border-red-100/40 italic leading-tight font-normal">
+                    {item.disclaimer}
+                  </div>
+                )}
+              </Link>
+            );
+          })}
         </nav>
       </div>
     </aside>
