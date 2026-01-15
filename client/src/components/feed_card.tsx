@@ -14,45 +14,42 @@ export function FeedCard({ id, title, avatar, draft, listed, top, summary, hasht
     }) {
     const { t } = useTranslation()
     return useMemo(() => (
-        <>
-            <Link href={`/feed/${id}`} target="_blank" className="w-full rounded-2xl bg-w my-2 p-6 duration-300 bg-button">
-                {avatar &&
-                    <div className="flex flex-row items-center mb-2 rounded-xl overflow-clip">
-                        <img src={avatar} alt=""
-                            className="object-cover object-center w-full max-h-96 hover:scale-105 translation duration-300" />
-                    </div>}
-                <h1 className="text-xl font-bold text-gray-700 dark:text-white text-pretty overflow-hidden">
+        <Link href={`/feed/${id}`} target="_blank" 
+              className="block overflow-hidden rounded-3xl bg-card-light dark:bg-card-dark shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 border border-neutral-200 dark:border-neutral-700">
+            {avatar &&
+                <div className="w-full h-72 overflow-hidden">
+                    <img src={avatar} alt=""
+                         className="w-full h-full object-cover hover:scale-110 transition-transform duration-700" />
+                </div>}
+            <div className="p-10">
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-6 line-clamp-2 hover:text-theme transition-colors">
                     {title}
                 </h1>
-                <p className="space-x-2">
-                    <span className="text-gray-400 text-sm" title={new Date(createdAt).toLocaleString()}>
+                <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 dark:text-gray-400 mb-6">
+                    <span title={new Date(createdAt).toLocaleString()}>
                         {createdAt === updatedAt ? timeago(createdAt) : t('feed_card.published$time', { time: timeago(createdAt) })}
                     </span>
                     {createdAt !== updatedAt &&
-                        <span className="text-gray-400 text-sm" title={new Date(updatedAt).toLocaleString()}>
+                        <span title={new Date(updatedAt).toLocaleString()}>
                             {t('feed_card.updated$time', { time: timeago(updatedAt) })}
-                        </span>
-                    }
-                </p>
-                <p className="space-x-2">
-                    {draft === 1 && <span className="text-gray-400 text-sm">{t("draft")}</span>}
-                    {listed === 0 && <span className="text-gray-400 text-sm">{t("unlisted")}</span>}
-                    {top === 1 && <span className="text-theme text-sm">
+                        </span>}
+                    {draft === 1 && <span className="px-3 py-1 bg-orange-100 text-orange-800 dark:bg-orange-900/50 dark:text-orange-400 rounded-full text-xs font-medium">{t("draft")}</span>}
+                    {listed === 0 && <span className="px-3 py-1 bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 rounded-full text-xs font-medium">{t("unlisted")}</span>}
+                    {top === 1 && <span className="px-3 py-1 bg-theme text-white rounded-full text-xs font-medium">
                         {t('article.top.title')}
                     </span>}
-                </p>
-                <p className="text-pretty overflow-hidden dark:text-neutral-500">
+                </div>
+                <div className="prose prose-base dark:prose-invert text-gray-700 dark:text-gray-300 line-clamp-5 mb-8 leading-relaxed">
                     {summary}
-                </p>
+                </div>
                 {hashtags.length > 0 &&
-                    <div className="mt-2 flex flex-row flex-wrap justify-start gap-x-2">
+                    <div className="flex flex-wrap gap-3">
                         {hashtags.map(({ name }, index) => (
                             <HashTag key={index} name={name} />
                         ))}
                     </div>
                 }
-
-            </Link>
-        </>
+            </div>
+        </Link>
     ), [id, title, avatar, draft, listed, top, summary, hashtags, createdAt, updatedAt])
 }

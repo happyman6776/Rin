@@ -3,7 +3,6 @@ import { Link, useLocation } from 'wouter';
 
 const Sidebar: React.FC = () => {
   const [location] = useLocation();
-
   const menuItems = [
     { name: "营养与饮食", path: "/nutrition" },
     { name: "慢病管理", subtitle: "三高/糖尿病等", path: "/chronic-disease" },
@@ -17,38 +16,42 @@ const Sidebar: React.FC = () => {
   ];
 
   return (
-    <aside className="w-64 flex-shrink-0 hidden lg:block">
-      <div className="sticky top-28 space-y-6 pr-4">
-        {/* 侧边栏标题设计 */}
-        <div className="px-4">
-          <h2 className="text-[11px] font-black text-blue-600/60 uppercase tracking-[0.25em]">
+    <aside className="w-full flex-shrink-0 hidden lg:block">
+      <div className="sticky top-28 space-y-8">
+        <div className="px-6">
+          <h2 className="text-xs font-black text-theme/70 uppercase tracking-widest">
             健康专栏
           </h2>
-          <div className="h-1 w-6 bg-blue-500/30 mt-1.5 rounded-full"></div>
+          <div className="h-1 w-12 bg-theme/20 mt-2 rounded-full"></div>
         </div>
 
-        <nav className="flex flex-col gap-1.5">
+        <nav className="flex flex-col gap-2 px-4">
           {menuItems.map((item) => {
             const isActive = location === item.path;
             return (
-              <Link 
-                key={item.name} 
+              <Link
+                key={item.name}
                 to={item.path}
-                className={`group block px-4 py-3.5 rounded-2xl transition-all duration-300 no-underline
-                  ${isActive 
-                    ? 'bg-blue-50/80 shadow-sm text-blue-700' 
-                    : 'hover:bg-neutral-50 text-neutral-600 hover:translate-x-1'}`}
+                className={`
+                  group block px-6 py-4 rounded-2xl transition-all duration-300 no-underline
+                  ${isActive
+                    ? 'bg-theme/10 shadow-md shadow-theme/20 text-theme font-bold'
+                    : 'text-gray-700 dark:text-gray-300 hover:bg-neutral-100/70 dark:hover:bg-neutral-800/50 hover:translate-x-2 hover:shadow-sm'}
+                `}
               >
-                <div className={`text-[15px] font-bold ${isActive ? 'scale-105' : ''} transition-transform origin-left`}>
+                <div className={`
+                  text-lg font-semibold transition-all duration-300
+                  ${isActive ? 'translate-x-1' : 'group-hover:translate-x-1'}
+                `}>
                   {item.name}
                 </div>
                 {item.subtitle && (
-                  <div className={`text-[11px] mt-0.5 font-normal opacity-70`}>
+                  <div className="text-sm mt-1 font-medium text-gray-500 dark:text-gray-400 opacity-80">
                     {item.subtitle}
                   </div>
                 )}
                 {item.disclaimer && (
-                  <div className="text-[9px] text-red-400 mt-2 pt-2 border-t border-red-100/40 italic leading-tight font-normal">
+                  <div className="text-xs text-red-500/80 dark:text-red-400/80 mt-3 pt-3 border-t border-red-200/30 dark:border-red-800/30 italic leading-relaxed">
                     {item.disclaimer}
                   </div>
                 )}
@@ -56,6 +59,13 @@ const Sidebar: React.FC = () => {
             );
           })}
         </nav>
+
+        <div className="px-6 pt-6 border-t border-neutral-200/50 dark:border-neutral-700/50">
+          <p className="text-xs text-gray-500 dark:text-gray-400 italic leading-relaxed">
+            本站内容仅供健康参考<br />
+            如有不适，请及时就医
+          </p>
+        </div>
       </div>
     </aside>
   );
