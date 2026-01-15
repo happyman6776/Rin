@@ -1,223 +1,64 @@
-import { useEffect, useRef, useState, useContext } from 'react'
-import { Helmet } from 'react-helmet'
-import { getCookie } from 'typescript-cookie'
-import { DefaultParams, PathPattern, Route, Switch } from 'wouter'
-import Footer from './components/footer'
-import { Header } from './components/header'
-import { Padding } from './components/padding'
-import useTableOfContents from './hooks/useTableOfContents.tsx'
-import { client } from './main'
-import { CallbackPage } from './page/callback'
-import { FeedPage, TOCHeader } from './page/feed'
-import { FeedsPage } from './page/feeds'
-import { FriendsPage } from './page/friends'
-import { HashtagPage } from './page/hashtag.tsx'
-import { HashtagsPage } from './page/hashtags.tsx'
-import { Settings } from "./page/settings.tsx"
-import { TimelinePage } from './page/timeline'
-import { WritingPage } from './page/writing'
-import { ClientConfigContext, ConfigWrapper, defaultClientConfig } from './state/config.tsx'
-import { Profile, ProfileContext } from './state/profile'
-import { headersWithAuth } from './utils/auth'
-import { tryInt } from './utils/int'
-import { SearchPage } from './page/search.tsx'
-import { Tips, TipsPage } from './components/tips.tsx'
-import { useTranslation } from 'react-i18next'
-import { MomentsPage } from './page/moments'
-import { ErrorPage } from './page/error.tsx'
-import Sidebar from './components/Sidebar' // [注入] 导入侧边栏组件
+import React from 'react';
+import { Link, useLocation } from 'wouter';
 
-function App() {
-  const ref = useRef(false)
-  const { t } = useTranslation()
-  const [profile, setProfile] = useState<Profile | undefined>()
-  const [config, setConfig] = useState<ConfigWrapper>(new ConfigWrapper({}, new Map()))
-  
-  useEffect(() => {
-    // --- 自动缩放逻辑 ---
-    const HIGH_RES_THRESHOLD = 2560;
-    const applyScaling = () => {
-      if (window.screen.width >= HIGH_RES_THRESHOLD) {
-        document.documentElement.style.fontSize = '125%';
-      } else {
-        document.documentElement.style.fontSize = '100%';
-      }
-    };
-    applyScaling();
-    
-    if (ref.current) return
-    if ((getCookie('token')?.length ?? 0) > 0) {
-      client.user.profile.get({
-        headers: headersWithAuth()
-      }).then(({ data }) => {
-        if (data && typeof data !== 'string') {
-          setProfile({
-            id: data.id,
-            avatar: data.avatar || '',
-            permission: data.permission,
-            name: data.username
-          })
-        }
-      })
-    }
-    const config = sessionStorage.getItem('config')
-    if (config) {
-      const configObj = JSON.parse(config)
-      const configWrapper = new ConfigWrapper(configObj, defaultClientConfig)
-      setConfig(configWrapper)
-    } else {
-      client.config({ type: "client" }).get().then(({ data }) => {
-        if (data && typeof data !== 'string') {
-          sessionStorage.setItem('config', JSON.stringify(data))
-          const config = new ConfigWrapper(data, defaultClientConfig)
-          setConfig(config)
-        }
-      })
-    }
-    ref.current = true
-  }, [])
+const Sidebar: React.FC = () => {
+  const [location] = useLocation();
 
-  const favicon = `${process.env.API_URL}/favicon`;
+  const menuItems = [
+    { name: "营养与饮食", path: "/nutrition" },
+    { name: "慢病管理", subtitle: "三高/糖尿病等", path: "/chronic-disease" },
+    { name: "运动与康复", path: "/exercise" },
+    { name: "心理与睡眠", path: "/mental-health" },
+    { name: "常见病防治", path: "/common-diseases" },
+    { name: "健康生活", subtitle: "体检/疫苗/体重等", path: "/healthy-living" },
+    { name: "妇幼健康", path: "/maternal-child" },
+    { name: "中医养生", disclaimer: "免责声明：内容仅供参考，就诊请遵医嘱", path: "/tcm" },
+    { name: "名医介绍", path: "/doctors" },
+  ];
 
   return (
-    <>
-      <ClientConfigContext.Provider value={config}>
-        <ProfileContext.Provider value={profile}>
-          <Helmet>
-            {favicon && <link rel="icon" href={favicon} />}
-          </Helmet>
-          <Switch>
-            <RouteMe path="/">
-              <FeedsPage />
-            </RouteMe>
+    <aside className="w-64 flex-shrink-0 hidden lg:block">
+      <div className="sticky top-28 space-y-6 pr-4">
+        {/* 侧边栏标题设计 */}
+        <div className="px-4">
+          <h2 className="text-[11px] font-black text-blue-600/60 uppercase tracking-[0.25em]">
+            健康专栏
+          </h2>
+          <div className="h-1 w-6 bg-blue-500/30 mt-1.5 rounded-full"></div>
+        </div>
 
-            <RouteMe path="/timeline">
-              <TimelinePage />
-            </RouteMe>
-            
-            <RouteMe path="/moments">
-              <MomentsPage />
-            </RouteMe>
+        <nav className="flex flex-col gap-1.5">
+          {menuItems.map((item) => {
+            const isActive = location === item.path;
+            return (
+              <Link 
+                key={item.name} 
+                to={item.path}
+                className={`group block px-4 py-3.5 rounded-2xl transition-all duration-300 no-underline
+                  ${isActive 
+                    ? 'bg-blue-50/80 shadow-sm text-blue-700' 
+                    : 'hover:bg-neutral-50 text-neutral-600 hover:translate-x-1'}`}
+              >
+                <div className={`text-[15px] font-bold ${isActive ? 'scale-105' : ''} transition-transform origin-left`}>
+                  {item.name}
+                </div>
+                {item.subtitle && (
+                  <div className={`text-[11px] mt-0.5 font-normal opacity-70`}>
+                    {item.subtitle}
+                  </div>
+                )}
+                {item.disclaimer && (
+                  <div className="text-[9px] text-red-400 mt-2 pt-2 border-t border-red-100/40 italic leading-tight font-normal">
+                    {item.disclaimer}
+                  </div>
+                )}
+              </Link>
+            );
+          })}
+        </nav>
+      </div>
+    </aside>
+  );
+};
 
-            <RouteMe path="/friends">
-              <FriendsPage />
-            </RouteMe>
-
-            <RouteMe path="/hashtags">
-              <HashtagsPage />
-            </RouteMe>
-
-            <RouteMe path="/hashtag/:name">
-              {params => <HashtagPage name={params.name || ""} />}
-            </RouteMe>
-
-            <RouteMe path="/search/:keyword">
-              {params => <SearchPage keyword={params.keyword || ""} />}
-            </RouteMe>
-
-            <RouteMe path="/settings" paddingClassName='mx-4' requirePermission>
-              <Settings />
-            </RouteMe>
-
-            <RouteMe path="/writing" paddingClassName='mx-4' requirePermission>
-              <WritingPage />
-            </RouteMe>
-
-            <RouteMe path="/writing/:id" paddingClassName='mx-4' requirePermission>
-              {({ id }) => {
-                const id_num = tryInt(0, id)
-                return <WritingPage id={id_num} />
-              }}
-            </RouteMe>
-
-            <RouteMe path="/callback" >
-              <CallbackPage />
-            </RouteMe>
-
-            <RouteWithIndex path="/feed/:id">
-              {(params, TOC, clean) => <FeedPage id={params.id || ""} TOC={TOC} clean={clean} />}
-            </RouteWithIndex>
-
-            {/* 这里的 :alias 会匹配侧边栏中的 path，例如 /nutrition */}
-            <RouteWithIndex path="/:alias">
-              {(params, TOC, clean) => <FeedPage id={params.alias || ""} TOC={TOC} clean={clean} />}
-            </RouteWithIndex>
-
-            <RouteMe path="/user/github">
-              {_ => (
-                <TipsPage>
-                  <Tips value={t('error.api_url')} type='error' />
-                </TipsPage>
-              )}
-            </RouteMe>
-
-            <RouteMe path="/*/user/github">
-              {_ => (
-                <TipsPage>
-                  <Tips value={t('error.api_url_slash')} type='error' />
-                </TipsPage>
-              )}
-            </RouteMe>
-
-            <RouteMe path="/user/github/callback">
-              {_ => (
-                <TipsPage>
-                  <Tips value={t('error.github_callback')} type='error' />
-                </TipsPage>
-              )}
-            </RouteMe>
-
-            <RouteMe>
-              <ErrorPage error={t('error.not_found')} />
-            </RouteMe>
-          </Switch>
-        </ProfileContext.Provider>
-      </ClientConfigContext.Provider>
-    </>
-  )
-}
-
-function RouteMe({ path, children, headerComponent, paddingClassName, requirePermission }:
-  { path?: PathPattern, children: React.ReactNode | ((params: DefaultParams) => React.ReactNode), headerComponent?: React.ReactNode, paddingClassName?: string, requirePermission?: boolean }) {
-  
-  if (requirePermission) {
-    const profile = useContext(ProfileContext);
-    const { t } = useTranslation();
-    if (!profile?.permission)
-      children = <ErrorPage error={t('error.permission_denied')} />;
-  }
-
-  return (
-    <Route path={path} >
-      {params => {
-        return (<>
-          <Header>
-            {headerComponent}
-          </Header>
-          <Padding className={paddingClassName}>
-            {/* [核心布局修改] 增加 flex 容器包装侧边栏和主体内容 */}
-            <div className="flex flex-col lg:flex-row gap-12 max-w-7xl mx-auto min-h-[60vh]">
-              <Sidebar />
-              <main className="flex-1 min-w-0">
-                {typeof children === 'function' ? children(params) : children}
-              </main>
-            </div>
-          </Padding>
-          <Footer />
-        </>)
-      }}
-    </Route>
-  )
-}
-
-function RouteWithIndex({ path, children }:
-  { path: PathPattern, children: (params: DefaultParams, TOC: () => JSX.Element, clean: (id: string) => void) => React.ReactNode }) {
-  const { TOC, cleanup } = useTableOfContents(".toc-content");
-  return (<RouteMe path={path} headerComponent={TOCHeader({ TOC: TOC })} paddingClassName='mx-4'>
-    {params => {
-      return children(params, TOC, cleanup)
-    }}
-  </RouteMe>)
-}
-
-export default App
+export default Sidebar;
