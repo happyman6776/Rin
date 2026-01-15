@@ -25,26 +25,28 @@ import { Tips, TipsPage } from './components/tips.tsx'
 import { useTranslation } from 'react-i18next'
 import { MomentsPage } from './page/moments'
 import { ErrorPage } from './page/error.tsx'
+import Sidebar from './components/Sidebar' // [注入] 导入侧边栏组件
 
 function App() {
   const ref = useRef(false)
   const { t } = useTranslation()
   const [profile, setProfile] = useState<Profile | undefined>()
   const [config, setConfig] = useState<ConfigWrapper>(new ConfigWrapper({}, new Map()))
+  
   useEffect(() => {
-    // --- 自动缩放逻辑开始 ---
-    const HIGH_RES_THRESHOLD = 2560; // 定义高分屏阈值
+    // --- 自动缩放逻辑 ---
+    const HIGH_RES_THRESHOLD = 2560;
     const applyScaling = () => {
       if (window.screen.width >= HIGH_RES_THRESHOLD) {
-        document.documentElement.style.fontSize = '125%'; // 应用 125% 缩放
+        document.documentElement.style.fontSize = '125%';
       } else {
-        document.documentElement.style.fontSize = '100%'; // 恢复默认
+        document.documentElement.style.fontSize = '100%';
       }
     };
     applyScaling();
-    // --- 自动缩放逻辑结束 ---
+    
     if (ref.current) return
-    if (getCookie('token')?.length ?? 0 > 0) {
+    if ((getCookie('token')?.length ?? 0) > 0) {
       client.user.profile.get({
         headers: headersWithAuth()
       }).then(({ data }) => {
@@ -74,14 +76,15 @@ function App() {
     }
     ref.current = true
   }, [])
+
   const favicon = `${process.env.API_URL}/favicon`;
+
   return (
     <>
       <ClientConfigContext.Provider value={config}>
         <ProfileContext.Provider value={profile}>
           <Helmet>
-            {favicon &&
-              <link rel="icon" href={favicon} />}
+            {favicon && <link rel="icon" href={favicon} />}
           </Helmet>
           <Switch>
             <RouteMe path="/">
@@ -105,21 +108,16 @@ function App() {
             </RouteMe>
 
             <RouteMe path="/hashtag/:name">
-              {params => {
-                return (<HashtagPage name={params.name || ""} />)
-              }}
+              {params => <HashtagPage name={params.name || ""} />}
             </RouteMe>
 
             <RouteMe path="/search/:keyword">
-              {params => {
-                return (<SearchPage keyword={params.keyword || ""} />)
-              }}
+              {params => <SearchPage keyword={params.keyword || ""} />}
             </RouteMe>
 
             <RouteMe path="/settings" paddingClassName='mx-4' requirePermission>
               <Settings />
             </RouteMe>
-
 
             <RouteMe path="/writing" paddingClassName='mx-4' requirePermission>
               <WritingPage />
@@ -128,9 +126,7 @@ function App() {
             <RouteMe path="/writing/:id" paddingClassName='mx-4' requirePermission>
               {({ id }) => {
                 const id_num = tryInt(0, id)
-                return (
-                  <WritingPage id={id_num} />
-                )
+                return <WritingPage id={id_num} />
               }}
             </RouteMe>
 
@@ -139,17 +135,12 @@ function App() {
             </RouteMe>
 
             <RouteWithIndex path="/feed/:id">
-              {(params, TOC, clean) => {
-                return (<FeedPage id={params.id || ""} TOC={TOC} clean={clean} />)
-              }}
+              {(params, TOC, clean) => <FeedPage id={params.id || ""} TOC={TOC} clean={clean} />}
             </RouteWithIndex>
 
+            {/* 这里的 :alias 会匹配侧边栏中的 path，例如 /nutrition */}
             <RouteWithIndex path="/:alias">
-              {(params, TOC, clean) => {
-                return (
-                  <FeedPage id={params.alias || ""} TOC={TOC} clean={clean} />
-                )
-              }}
+              {(params, TOC, clean) => <FeedPage id={params.alias || ""} TOC={TOC} clean={clean} />}
             </RouteWithIndex>
 
             <RouteMe path="/user/github">
@@ -176,7 +167,6 @@ function App() {
               )}
             </RouteMe>
 
-            {/* Default route in a switch */}
             <RouteMe>
               <ErrorPage error={t('error.not_found')} />
             </RouteMe>
@@ -189,12 +179,14 @@ function App() {
 
 function RouteMe({ path, children, headerComponent, paddingClassName, requirePermission }:
   { path?: PathPattern, children: React.ReactNode | ((params: DefaultParams) => React.ReactNode), headerComponent?: React.ReactNode, paddingClassName?: string, requirePermission?: boolean }) {
+  
   if (requirePermission) {
     const profile = useContext(ProfileContext);
     const { t } = useTranslation();
     if (!profile?.permission)
       children = <ErrorPage error={t('error.permission_denied')} />;
   }
+
   return (
     <Route path={path} >
       {params => {
@@ -203,7 +195,13 @@ function RouteMe({ path, children, headerComponent, paddingClassName, requirePer
             {headerComponent}
           </Header>
           <Padding className={paddingClassName}>
-            {typeof children === 'function' ? children(params) : children}
+            {/* [核心布局修改] 增加 flex 容器包装侧边栏和主体内容 */}
+            <div className="flex flex-col lg:flex-row gap-12 max-w-7xl mx-auto min-h-[60vh]">
+              <Sidebar />
+              <main className="flex-1 min-w-0">
+                {typeof children === 'function' ? children(params) : children}
+              </main>
+            </div>
           </Padding>
           <Footer />
         </>)
@@ -211,7 +209,6 @@ function RouteMe({ path, children, headerComponent, paddingClassName, requirePer
     </Route>
   )
 }
-
 
 function RouteWithIndex({ path, children }:
   { path: PathPattern, children: (params: DefaultParams, TOC: () => JSX.Element, clean: (id: string) => void) => React.ReactNode }) {
