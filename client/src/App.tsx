@@ -193,13 +193,14 @@ function RouteMe({ path, children, headerComponent, paddingClassName, requirePer
             {headerComponent}
           </Header>
           <Padding className={paddingClassName}>
-            {/* 放宽容器宽度并优化比例 */}
-            <div className="flex flex-col lg:flex-row gap-8 xl:gap-12 max-w-[1440px] mx-auto py-8">
+            {/* 这里的 max-w-screen-2xl 会显著放宽页面，减少左右留白 */}
+            <div className="flex flex-col lg:flex-row gap-6 xl:gap-10 max-w-screen-2xl mx-auto py-6">
               <aside className="w-full lg:w-[240px] flex-shrink-0">
                 <Sidebar />
               </aside>
-              <main className="flex-1 min-w-0 bg-white/40 backdrop-blur-md rounded-[2rem] shadow-sm border border-neutral-100/50 p-4 md:p-8">
-                <div className="max-w-4xl mx-auto">
+              {/* 这里移除了内部的宽度限制，内容会占据右侧整个白色区域 */}
+              <main className="flex-1 min-w-0 bg-white/45 backdrop-blur-md rounded-[2.5rem] shadow-sm border border-neutral-100/40 p-5 md:p-10">
+                <div className="w-full h-full toc-content">
                   {typeof children === 'function' ? children(params) : children}
                 </div>
               </main>
@@ -222,5 +223,4 @@ function RouteWithIndex({ path, children }:
   </RouteMe>)
 }
 
-// 必须要有这一行，否则 main.tsx 找不到 App 组件
 export default App
