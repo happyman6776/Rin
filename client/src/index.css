@@ -1,6 +1,5 @@
 @import "./base.css";
 
-/* 字体配置 */
 @font-face {
   font-family: "Cantarell";
   font-style: normal;
@@ -17,68 +16,87 @@ body {
   overflow-x: hidden;
 }
 
-textarea:focus {
-  outline: none;
-}
+textarea:focus { outline: none; }
 
-/* Markdown 内容美化 */
+/* --- Markdown 内容美化 --- */
 .wmde-markdown {
   @apply bg-transparent;
   font-family: inherit !important;
   line-height: 1.8;
+  width: 100%; /* 确保占据剩余空间 */
 }
 
 .wmde-markdown img {
-  @apply rounded-[2rem] shadow-xl my-10 transition-transform duration-500 hover:scale-[1.02];
+  @apply rounded-[1.5rem] shadow-lg my-8 transition-transform duration-500 hover:scale-[1.01];
   display: block;
   margin-left: auto;
   margin-right: auto;
+  max-width: 100%;
 }
 
 .wmde-markdown code {
-  @apply text-indigo-600 bg-indigo-50/80 px-2 py-0.5 rounded-lg mx-1 font-mono text-[0.9em];
+  @apply text-indigo-600 bg-indigo-50/80 px-1.5 py-0.5 rounded mx-1 font-mono text-[0.9em];
 }
 
 .link-line a {
-  @apply text-indigo-600 no-underline border-b border-transparent hover:border-indigo-600 transition-all duration-300;
+  @apply text-indigo-600 no-underline border-b border-transparent hover:border-indigo-600 transition-all;
 }
 
-/* 警示框 */
+/* 警示框优化 */
 .markdown-alert {
-  @apply !border-l-[6px] border border-slate-200 rounded-[1.5rem] !py-5 my-8 !px-8 shadow-sm;
+  @apply !border-l-[5px] border border-slate-200 rounded-xl !py-4 my-6 !px-6 shadow-sm;
 }
-.markdown-alert-note { @apply !border-blue-500 bg-blue-50/40 !text-blue-900; }
-.markdown-alert-tip { @apply !border-emerald-500 bg-emerald-50/40 !text-emerald-900; }
+.markdown-alert-note { @apply !border-blue-500 bg-blue-50/50 !text-blue-900; }
+.markdown-alert-tip { @apply !border-emerald-500 bg-emerald-50/50 !text-emerald-900; }
 
-/* 表格 */
+/* 表格优化 */
 .table { 
-  @apply w-full border-collapse my-8 rounded-[1.25rem] overflow-hidden shadow-sm border border-slate-200; 
+  @apply w-full border-collapse my-6 rounded-xl overflow-hidden shadow-sm border border-slate-200; 
   display: block !important; 
 }
-.table th { @apply bg-slate-100/80 font-bold text-slate-700 px-6 py-4 text-left; }
-.table td { @apply border-t border-slate-100 px-6 py-4 text-slate-600; }
+.table th { @apply bg-slate-100 font-bold text-slate-700 px-4 py-3 text-left; }
+.table td { @apply border-t border-slate-100 px-4 py-3 text-slate-600; }
 
-/* 侧边栏 TOC (已移除导致报错的 scrollbar-hide) */
+/* --- 核心修复：目录 (TOC) 样式 --- */
 .toc { 
-  @apply pr-4;
-  max-height: calc(100vh - 200px);
+  @apply pr-2 pl-6 border-l border-slate-100 ml-8 hidden xl:block; /* 大屏显示，增加左边距和分割线 */
+  min-width: 240px; /* 强制最小宽度，防止被挤压 */
+  max-width: 300px;
+  max-height: calc(100vh - 150px);
   overflow-y: auto;
-  scrollbar-width: none; /* Firefox 隐藏滚动条 */
-  -ms-overflow-style: none; /* IE 隐藏滚动条 */
+  position: sticky;
+  top: 100px;
 }
-.toc::-webkit-scrollbar { display: none; } /* Chrome/Safari 隐藏滚动条 */
 
-.toc-list { @apply m-0 pl-4 border-l border-slate-200 list-none space-y-2; }
+.toc-list { 
+  @apply m-0 list-none space-y-3; 
+}
+
 a.toc-link { 
-  @apply text-slate-500 text-sm no-underline transition-all duration-300 hover:text-indigo-600; 
-}
-.is-active-link { 
-  @apply text-indigo-600 font-bold scale-105 origin-left; 
+  @apply text-slate-400 text-sm no-underline transition-colors duration-200 block;
+  /* 修复文字换行问题 */
+  white-space: normal;
+  word-break: normal;
+  overflow-wrap: break-word;
+  line-height: 1.5;
 }
 
-/* 入场动画 */
+a.toc-link:hover {
+  @apply text-indigo-600;
+}
+
+.is-active-link { 
+  @apply text-indigo-600 font-bold; 
+}
+
+/* 隐藏目录中可能出现的“没有更多了”等多余页脚 */
+.toc + div, .toc .footer, .toc ~ .footer {
+  display: none !important;
+}
+
+/* 动画 */
 @keyframes anvil {
   0% { transform: translateY(10px); opacity: 0; }
   100% { transform: translateY(0); opacity: 1; }
 }
-.ani-show { animation: anvil 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+.ani-show { animation: anvil 0.5s ease-out forwards; }
