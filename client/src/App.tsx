@@ -127,18 +127,19 @@ function RouteMe({ path, children, headerComponent, paddingClassName, requirePer
       {params => (
         <>
           <Header>{headerComponent}</Header>
-          <Padding className={`${paddingClassName || ''} w-full px-2 md:px-6`}>
-            {/* 布局优化：移除 mx-auto 实现左移，并进一步加大 max-width */}
-            <div className="flex flex-col lg:flex-row gap-4 xl:gap-8 max-w-[1600px] py-6">
+          {/* 1. 将 Padding 的内边距缩小，确保侧边栏紧贴左边 */}
+          <Padding className={`${paddingClassName || ''} w-full pl-4 md:pl-8 pr-4 md:pr-12`}>
+            {/* 2. 移除 mx-auto，确保布局靠左；max-w 设置为 1800px 或更高 */}
+            <div className="flex flex-col lg:flex-row gap-6 xl:gap-10 py-8 max-w-[1800px]">
               
-              {/* 侧边栏：固定宽度，减少干扰 */}
-              <aside className="w-full lg:w-[200px] xl:w-[220px] flex-shrink-0">
+              {/* 3. 侧边栏：保持固定宽度 */}
+              <aside className="w-full lg:w-[220px] flex-shrink-0">
                 <Sidebar />
               </aside>
               
-              {/* 内容区：占据剩余空间，取消内部所有宽度限制 */}
-              <main className="flex-1 min-w-0 bg-white/60 backdrop-blur-sm shadow-sm border border-neutral-100 rounded-[2rem]">
-                <div className="w-full h-full p-4 md:p-10 toc-content">
+              {/* 4. 内容区：移除任何 max-width，占据剩余全部空间 */}
+              <main className="flex-1 min-w-0 bg-white/60 backdrop-blur-sm shadow-sm border border-neutral-100 rounded-[2.5rem]">
+                <div className="w-full h-full p-6 md:p-12 toc-content">
                   {typeof children === 'function' ? children(params) : children}
                 </div>
               </main>
