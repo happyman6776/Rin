@@ -125,29 +125,20 @@ function RouteMe({ path, children, headerComponent, paddingClassName, requirePer
   return (
     <Route path={path} >
       {params => (
-        <div className="flex flex-col min-h-screen bg-[#f8f9fa]">
+        <div className="flex flex-col min-h-screen">
           <Header>{headerComponent}</Header>
-          {/* 重点：Padding 不再携带 mx- 属性，确保内容块能自由向左靠拢 */}
-          <Padding className={`${paddingClassName || ''} flex-1 flex justify-start`}>
-            {/* 1. items-start: 确保顶部对齐
-               2. w-full max-w-[1920px]: 极其宽阔的视野
-               3. 移除 mx-auto: 彻底解决居中问题 
-            */}
-            <div className="flex flex-col lg:flex-row gap-6 xl:gap-10 py-8 w-full items-start">
+          {/* 这里去掉了 mx-auto，确保内容从左侧 pl- 处开始渲染 */}
+          <Padding className={`${paddingClassName || ''} flex-1`}>
+            <div className="flex flex-col lg:flex-row gap-8 xl:gap-12 py-8 w-full max-w-[2000px]">
               
-              {/* 侧边栏：微调宽度，确保与内容比例协调 */}
+              {/* 侧边栏：紧贴左侧 */}
               <aside className="w-full lg:w-[240px] flex-shrink-0 sticky top-24">
                 <Sidebar />
               </aside>
               
-              {/* 内容主卡片：
-                  - flex-1: 自动填满右侧剩余所有空间
-                  - bg-white: 纯净白底
-                  - shadow-sm: 柔和阴影，更具空气感
-                  - rounded-[2.5rem]: 现代感大圆角 
-              */}
-              <main className="flex-1 min-w-0 bg-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-neutral-100/80 rounded-[2.5rem] overflow-hidden">
-                <div className="w-full h-full p-6 md:p-12 lg:p-16 toc-content text-[1.05rem] leading-relaxed text-neutral-800">
+              {/* 主内容区：移除所有 max-w 限制，使用 flex-1 撑开 */}
+              <main className="flex-1 min-w-0 bg-white shadow-[0_8px_40px_rgba(0,0,0,0.03)] border border-neutral-100 rounded-[2.5rem] overflow-hidden">
+                <div className="w-full h-full p-6 md:p-12 lg:p-16 toc-content text-[1.05rem]">
                   {typeof children === 'function' ? children(params) : children}
                 </div>
               </main>
