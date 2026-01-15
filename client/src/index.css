@@ -1,9 +1,10 @@
 @import "./base.css";
 
+/* cantarell-latin-400-normal */
 @font-face {
   font-family: "Cantarell";
   font-style: normal;
-  font-display: swap;
+  font-display: auto;
   font-weight: 400;
   src: url(/cantarell_5.0.12_latin-400-normal.woff2) format("woff2"),
     url(/cantarell_5.0.13_latin-400-normal.woff) format("woff");
@@ -13,49 +14,56 @@
 }
 
 body {
-  @apply bg-background-light dark:bg-background-dark text-gray-800 dark:text-gray-200;
-  font-family: Cantarell, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  /* 替换掉可能报错的自定义变量，改用标准类名 */
+  @apply bg-slate-50 text-gray-800;
+  font-family: Cantarell, "Source Han Serif CN VF" !important;
   margin: 0;
   overflow-x: hidden;
-  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-textarea:focus { outline: none; }
+textarea:focus {
+  outline: none;
+}
 
 .wmde-markdown {
-  @apply bg-transparent prose prose-lg max-w-none dark:prose-invert;
-  line-height: 1.8;
+  @apply bg-transparent;
+  font-family: Cantarell, "Source Han Serif CN VF" !important;
 }
 
 .wmde-markdown img {
-  @apply rounded-2xl shadow-md mx-auto my-8 transition-transform duration-500 hover:scale-105;
+  @apply rounded-2xl shadow-md my-8;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-.wmde-markdown code {
-  @apply text-theme bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded-lg font-medium;
-}
+/* 列表与链接基础样式 */
+ol { list-style: decimal; }
+ul { list-style: initial; }
+.link-line a { @apply hover:underline; }
+.wmde-markdown code { @apply text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded-md mx-1; }
 
-.wmde-markdown pre {
-  @apply rounded-2xl overflow-x-auto p-6 my-8 shadow-inner bg-gray-50 dark:bg-gray-900;
-}
-
+/* 警示框样式优化 */
 .markdown-alert {
-  @apply border-l-4 rounded-2xl py-6 px-6 my-8 shadow-md leading-relaxed;
+  @apply !border-l-4 border rounded-2xl !py-4 my-6 !px-6 !leading-relaxed shadow-sm;
 }
+.markdown-alert-note { @apply !border-blue-400 bg-blue-50/60 !text-blue-800; }
+.markdown-alert-tip { @apply !border-emerald-400 bg-emerald-50/60 !text-emerald-800; }
 
-.markdown-alert-note { @apply border-blue-500 bg-blue-50/70 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300; }
-.markdown-alert-tip { @apply border-emerald-500 bg-emerald-50/70 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-300; }
+/* 表格美化 */
+.table { @apply w-full border-collapse my-6 rounded-xl overflow-hidden shadow-sm; display: block !important; }
+.table th, .table td { @apply border border-slate-100 px-4 py-3; }
+.table th { @apply bg-slate-50 font-bold; }
 
-.table { @apply w-full border-collapse my-8 overflow-x-auto block; }
-.table th, .table td { @apply border border-gray-300 dark:border-gray-600 px-6 py-4 text-left; }
-.table th { @apply bg-gray-100 dark:bg-gray-800 font-semibold; }
+/* TOC 样式保持原样 */
+.toc { overflow-y: auto; }
+.toc-list { margin: 0; padding-left: 10px; list-style: none; }
+a.toc-link { color: currentColor; display: block; @apply transition-colors duration-200; }
+.is-active-link { font-weight: 700; @apply text-indigo-600; }
 
-.toc { @apply overflow-y-auto max-h-screen; }
-.is-active-link { @apply font-bold text-theme; }
-
-/* 动画淡入（用于卡片/评论） */
-@keyframes fade-in {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+/* 动画效果 */
+@keyframes anvil {
+  0% { transform: scale(0.98); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
 }
-.animate-fade-in { animation: fade-in 0.6s ease-out; }
+.ani-show { animation: anvil 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
