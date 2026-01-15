@@ -10,7 +10,11 @@ import { client } from './main'
 import { CallbackPage } from './page/callback'
 import { FeedPage, TOCHeader } from './page/feed'
 import { FeedsPage } from './page/feeds'
+import { FriendsPage } from './page/friends'
+import { HashtagPage } from './page/hashtag.tsx'
+import { HashtagsPage } from './page/hashtags.tsx'
 import { Settings } from "./page/settings.tsx"
+import { TimelinePage } from './page/timeline'
 import { WritingPage } from './page/writing'
 import { ClientConfigContext, ConfigWrapper, defaultClientConfig } from './state/config.tsx'
 import { Profile, ProfileContext } from './state/profile'
@@ -18,6 +22,7 @@ import { headersWithAuth } from './utils/auth'
 import { tryInt } from './utils/int'
 import { SearchPage } from './page/search.tsx'
 import { useTranslation } from 'react-i18next'
+import { MomentsPage } from './page/moments'
 import { ErrorPage } from './page/error.tsx'
 import Sidebar from './components/Sidebar'
 
@@ -26,7 +31,7 @@ function App() {
   const { t } = useTranslation()
   const [profile, setProfile] = useState<Profile | undefined>()
   const [config, setConfig] = useState<ConfigWrapper>(new ConfigWrapper({}, new Map()))
-  
+
   useEffect(() => {
     const HIGH_RES_THRESHOLD = 2560;
     const applyScaling = () => {
@@ -37,7 +42,7 @@ function App() {
       }
     };
     applyScaling();
-   
+    
     if (ref.current) return
     if ((getCookie('token')?.length ?? 0) > 0) {
       client.user.profile.get({
@@ -69,9 +74,9 @@ function App() {
     }
     ref.current = true
   }, [])
-  
+
   const favicon = `${process.env.API_URL}/favicon`;
-  
+
   return (
     <>
       <ClientConfigContext.Provider value={config}>
@@ -81,13 +86,18 @@ function App() {
           </Helmet>
           <Switch>
             <RouteMe path="/"><FeedsPage /></RouteMe>
+            <RouteMe path="/timeline"><TimelinePage /></RouteMe>
+            <RouteMe path="/moments"><MomentsPage /></RouteMe>
+            <RouteMe path="/friends"><FriendsPage /></RouteMe>
+            <RouteMe path="/hashtags"><HashtagsPage /></RouteMe>
+            <RouteMe path="/hashtag/:name">{params => <HashtagPage name={params.name || ""} />}</RouteMe>
+            <RouteMe path="/search/:keyword">{params => <SearchPage keyword={params.keyword || ""} />}</RouteMe>
             <RouteMe path="/settings" requirePermission><Settings /></RouteMe>
             <RouteMe path="/writing" requirePermission><WritingPage /></RouteMe>
             <RouteMe path="/writing/:id" requirePermission>
               {({ id }) => <WritingPage id={tryInt(0, id)} />}
             </RouteMe>
             <RouteMe path="/callback"><CallbackPage /></RouteMe>
-            <RouteMe path="/search/:keyword">{params => <SearchPage keyword={params.keyword || ""} />}</RouteMe>
             <RouteWithIndex path="/feed/:id">
               {(params, TOC, clean) => <FeedPage id={params.id || ""} TOC={TOC} clean={clean} />}
             </RouteWithIndex>
@@ -104,32 +114,39 @@ function App() {
 
 function RouteMe({ path, children, headerComponent, paddingClassName, requirePermission }:
   { path?: PathPattern, children: React.ReactNode | ((params: DefaultParams) => React.ReactNode), headerComponent?: React.ReactNode, paddingClassName?: string, requirePermission?: boolean }) {
- 
+  
   if (requirePermission) {
     const profile = useContext(ProfileContext);
     const { t } = useTranslation();
     if (!profile?.permission)
       children = <ErrorPage error={t('error.permission_denied')} />;
   }
+
   return (
     <Route path={path} >
-      {(params: DefaultParams) => (
-        <div className="flex flex-col min-h-screen bg-background-light dark:bg-background-dark transition-colors duration-300">
+      {params => (
+        <div className="flex flex-col min-h-screen">
           <Header>{headerComponent}</Header>
           <Padding className={`${paddingClassName || ''} flex-1`}>
-            <div className="mx-auto max-w-7xl px-4 py-12 w-full">
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                <aside className="lg:col-span-3 sticky top-24 h-fit">
-                  <Sidebar />
-                </aside>
-                <main className="lg:col-span-9">
-                  <div className="bg-card-light dark:bg-card-dark rounded-3xl shadow-2xl overflow-hidden border border-neutral-200 dark:border-neutral-700">
-                    <div className="p-8 md:p-12 prose prose-lg max-w-none dark:prose-invert toc-content">
-                      {typeof children === 'function' ? children(params) : children}
-                    </div>
+            {/* 布局容器：最大宽度 2200px，确保在大屏下能容纳三栏 */}
+            <div className="flex flex-col lg:flex-row gap-8 xl:gap-10 py-8 w-full max-w-[2200px] items-start">
+              
+              {/* 左侧栏：固定 220px */}
+              <aside className="w-full lg:w-[220px] flex-shrink-0 sticky top-24 z-10">
+                <Sidebar />
+              </aside>
+              
+              {/* 主内容区：使用 flex-1 占据中间所有空间 */}
+              <main className="flex-1 min-w-0 bg-white/70 backdrop-blur-xl shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-neutral-100 rounded-[2.5rem] overflow-visible">
+                {/* 增加右侧内边距，防止内容贴到目录上（如果是移动端则不加） */}
+                <div className="w-full h-full p-6 md:p-10 lg:p-14 toc-content text-[1.05rem] leading-loose text-neutral-800 antialiased flex flex-col xl:flex-row gap-8">
+                   {/* 这里通过 CSS 让 children 里的 TOC 自动去右边 */}
+                  <div className="flex-1 min-w-0">
+                    {typeof children === 'function' ? children(params) : children}
                   </div>
-                </main>
-              </div>
+                </div>
+              </main>
+              
             </div>
           </Padding>
           <Footer />
@@ -144,7 +161,7 @@ function RouteWithIndex({ path, children }:
   const { TOC, cleanup } = useTableOfContents(".toc-content");
   return (
     <RouteMe path={path} headerComponent={TOCHeader({ TOC: TOC })} paddingClassName=''>
-      {(params: DefaultParams) => children(params, TOC, cleanup)}
+      {params => children(params, TOC, cleanup)}
     </RouteMe>
   )
 }
