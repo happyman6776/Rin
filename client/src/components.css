@@ -1,7 +1,8 @@
-@import "./base.css";
+/* 清理掉所有使用了 dark:bg-dark 的组件样式 */
+.card {
+  @apply bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm;
+}
 
-@layer base {
-    .border-card {
-        @apply shadow-lg border dark:border-neutral-600 shadow-deep rounded-xl p-4 bg-w text-sm t-secondary font-normal flex flex-col items-start mt-2 space-y-2
-    }
+.input {
+  @apply bg-slate-100 dark:bg-slate-800 border-none rounded-lg px-4 py-2;
 }
