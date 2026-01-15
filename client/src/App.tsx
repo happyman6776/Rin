@@ -89,82 +89,45 @@ function App() {
             <RouteMe path="/">
               <FeedsPage />
             </RouteMe>
-
             <RouteMe path="/timeline">
               <TimelinePage />
             </RouteMe>
-            
             <RouteMe path="/moments">
               <MomentsPage />
             </RouteMe>
-
             <RouteMe path="/friends">
               <FriendsPage />
             </RouteMe>
-
             <RouteMe path="/hashtags">
               <HashtagsPage />
             </RouteMe>
-
             <RouteMe path="/hashtag/:name">
               {params => <HashtagPage name={params.name || ""} />}
             </RouteMe>
-
             <RouteMe path="/search/:keyword">
               {params => <SearchPage keyword={params.keyword || ""} />}
             </RouteMe>
-
             <RouteMe path="/settings" paddingClassName='mx-4' requirePermission>
               <Settings />
             </RouteMe>
-
             <RouteMe path="/writing" paddingClassName='mx-4' requirePermission>
               <WritingPage />
             </RouteMe>
-
             <RouteMe path="/writing/:id" paddingClassName='mx-4' requirePermission>
               {({ id }) => {
                 const id_num = tryInt(0, id)
                 return <WritingPage id={id_num} />
               }}
             </RouteMe>
-
             <RouteMe path="/callback" >
               <CallbackPage />
             </RouteMe>
-
             <RouteWithIndex path="/feed/:id">
               {(params, TOC, clean) => <FeedPage id={params.id || ""} TOC={TOC} clean={clean} />}
             </RouteWithIndex>
-
             <RouteWithIndex path="/:alias">
               {(params, TOC, clean) => <FeedPage id={params.alias || ""} TOC={TOC} clean={clean} />}
             </RouteWithIndex>
-
-            <RouteMe path="/user/github">
-              {_ => (
-                <TipsPage>
-                  <Tips value={t('error.api_url')} type='error' />
-                </TipsPage>
-              )}
-            </RouteMe>
-
-            <RouteMe path="/*/user/github">
-              {_ => (
-                <TipsPage>
-                  <Tips value={t('error.api_url_slash')} type='error' />
-                </TipsPage>
-              )}
-            </RouteMe>
-
-            <RouteMe path="/user/github/callback">
-              {_ => (
-                <TipsPage>
-                  <Tips value={t('error.github_callback')} type='error' />
-                </TipsPage>
-              )}
-            </RouteMe>
-
             <RouteMe>
               <ErrorPage error={t('error.not_found')} />
             </RouteMe>
@@ -192,18 +155,23 @@ function RouteMe({ path, children, headerComponent, paddingClassName, requirePer
           <Header>
             {headerComponent}
           </Header>
-          <Padding className={paddingClassName}>
-            {/* 这里的 max-w-screen-2xl 会显著放宽页面，减少左右留白 */}
-            <div className="flex flex-col lg:flex-row gap-6 xl:gap-10 max-w-screen-2xl mx-auto py-6">
-              <aside className="w-full lg:w-[240px] flex-shrink-0">
+          {/* 使用 w-full 确保铺满屏幕宽度 */}
+          <Padding className={`${paddingClassName} w-full px-4 md:px-8`}>
+            {/* 布局容器：移除 max-w 限制，改用宽泛的 1440px，并在大屏靠左对齐 */}
+            <div className="flex flex-col lg:flex-row gap-6 mx-auto max-w-[1536px] py-8">
+              
+              {/* 侧边栏：缩小到 220px，腾出更多空间给内容 */}
+              <aside className="w-full lg:w-[220px] flex-shrink-0">
                 <Sidebar />
               </aside>
-              {/* 这里移除了内部的宽度限制，内容会占据右侧整个白色区域 */}
-              <main className="flex-1 min-w-0 bg-white/45 backdrop-blur-md rounded-[2.5rem] shadow-sm border border-neutral-100/40 p-5 md:p-10">
-                <div className="w-full h-full toc-content">
+              
+              {/* 内容区：强制 flex-1 占据所有剩余空间，不限制内容宽度 */}
+              <main className="flex-1 min-w-0 bg-white shadow-sm border border-neutral-100 rounded-[2rem] overflow-hidden">
+                <div className="w-full h-full p-6 md:p-10 toc-content">
                   {typeof children === 'function' ? children(params) : children}
                 </div>
               </main>
+              
             </div>
           </Padding>
           <Footer />
@@ -216,7 +184,7 @@ function RouteMe({ path, children, headerComponent, paddingClassName, requirePer
 function RouteWithIndex({ path, children }:
   { path: PathPattern, children: (params: DefaultParams, TOC: () => JSX.Element, clean: (id: string) => void) => React.ReactNode }) {
   const { TOC, cleanup } = useTableOfContents(".toc-content");
-  return (<RouteMe path={path} headerComponent={TOCHeader({ TOC: TOC })} paddingClassName='mx-4'>
+  return (<RouteMe path={path} headerComponent={TOCHeader({ TOC: TOC })} paddingClassName=''>
     {params => {
       return children(params, TOC, cleanup)
     }}
